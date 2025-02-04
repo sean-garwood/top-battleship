@@ -1,44 +1,131 @@
+:root {
+  --font-size: 16px;
+  --line-height: 1.5;
+  /* colors */
+  --accent: #ffffff;
+  --empty-cell: lightgrey;
+  --link-color: #1adae8;
+  --primary-color: #35424a;
+  --secondary-color: #e2e2e2;
+  --text-color: #333333;
+  /* effects */
+  --cell-borders: 1px solid #000;
+  --hover-border: 1px solid orange;
+  --hover: #4c5a63;
+}
+
+a {
+  color: var(--link-color);
+  text-decoration: none;
+}
+
 body {
   margin: 0;
   font-family: Arial, sans-serif;
-  background-color: #f4f4f4;
+  background-color: var(--secondary-color);
+  color: var(--text-color);
+  font-size: var(--font-size);
+  line-height: var(--line-height);
+  min-height: 100vh;
+}
+
+fieldset {
+  border: none;
+}
+
+legend {
+  display: none;
 }
 
 header {
-  background: #35424a;
-  color: #ffffff;
+  background: var(--primary-color);
+  color: var(--secondary-color);
   padding: 10px 0;
   text-align: center;
 }
 
-h1 {
+h1, h2{
   margin: 0;
 }
 
+h1 {
+  color: var(--secondary-color);
+}
+
 nav {
-  margin: 20px 0;
-}
-
-nav a {
-  color: #ffffff;
-  text-decoration: none;
-  margin: 0 15px;
-}
-
-nav a:hover {
-  text-decoration: underline;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin: 20px;
 }
 
 main {
   padding: 20px;
+  flex: 1;
 }
 
 footer {
   text-align: center;
   padding: 10px 0;
-  background: #35424a;
-  color: #ffffff;
-  position: relative;
-  bottom: 0;
+  background: var(--primary-color);
+  color: var(--accent);
+  margin-top: auto;
+  position: absolute;
   width: 100%;
+  bottom: 0;
+}
+
+.board {
+  display: grid;
+  grid-template-rows: repeat(10, 10fr);
+  background: var(--accent);
+  border: 1px solid var(--primary-color);
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  margin: 10px;
+  padding: 10px;
+  min-width: 300px;
+}
+
+.board-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.cell {
+  background: var(--empty-cell);
+  border: var(--cell-borders);
+  color: var(--accent);
+  font-size: 24px;
+  font-weight: bold;
+  height: 50px;
+  text-align: center;
+  width: 50px;
+}
+
+.cell:hover {
+  background: var(--hover);
+  color: var(--accent);
+  border: var(--hover-border);
+  transition: background ease 0.2s;
+}
+
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
+.ship {
+  background: var(--primary-color);
+}
+
+#boards-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: row;
+  min-height: 60vh;
+  width: 100%
 }

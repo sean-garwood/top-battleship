@@ -1,5 +1,6 @@
-import { BoardDimensions } from "../constants/BoardDimensions";
-import { Orientations } from "../constants/Orientations";
+import { BoardDimensions } from "../constants/BoardDimensions.js";
+import { Orientations } from "../constants/Orientations.js";
+import { PlayerTypes } from "../constants/PlayerTypes.js";
 class Gameboard {
   constructor() {
     this.width = BoardDimensions.BOARD_WIDTH;
@@ -21,6 +22,43 @@ class Gameboard {
 
   set allShipsSunk(value) {
     this._allShipsSunk = value;
+  }
+
+  draw(playerType) {
+    const boardDivContainerID =
+      playerType === PlayerTypes.HUMAN
+        ? "human-board-container"
+        : "computer-board-container";
+    const boardDivContainer = document.getElementById(boardDivContainerID);
+    const boardDiv = document.createElement("div");
+    boardDiv.classList.add("board");
+    boardDiv.id =
+      playerType === PlayerTypes.HUMAN ? "human-board" : "computer-board";
+    for (let y = BoardDimensions.BOARD_HEIGHT - 1; y >= 0; y--) {
+      const rowDiv = document.createElement("div");
+      rowDiv.classList.add("row");
+      rowDiv.dataset.y = y;
+      for (let x = 0; x < BoardDimensions.BOARD_WIDTH; x++) {
+        const cell = document.createElement("div");
+        cell.dataset.x = x;
+        cell.dataset.y = y;
+        cell.classList.add("cell");
+        playerType === PlayerTypes.HUMAN
+          ? cell.classList.add("human")
+          : cell.classList.add("computer");
+        rowDiv.appendChild(cell);
+        if (playerType === PlayerTypes.COMPUTER) {
+          cell.addEventListener("click", (e) => {
+            const x = parseInt(e.target.dataset.x);
+            const y = parseInt(e.target.dataset.y);
+            this.receiveAttack(x, y);
+          });
+        }
+      }
+      boardDiv.appendChild(rowDiv);
+    }
+
+    boardDivContainer.appendChild(boardDiv);
   }
 
   placeShip(ship, startAtX, startAtY, orientation) {
@@ -55,7 +93,6 @@ class Gameboard {
     }
     const exceedsWidth = x + ship.size > this.width;
     const exceedsHeight = y + ship.size > this.height;
-    // check orientation
 
     switch (orientation) {
       case Orientations.HORIZONTAL:

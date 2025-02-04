@@ -1,4 +1,4 @@
-const SHIPS = {
+const Ships = {
   CARRIER: {
     name: "Carrier",
     size: 5,
@@ -21,4 +21,4 @@ const SHIPS = {
   },
 };
 
-export { SHIPS };
+export { Ships };
