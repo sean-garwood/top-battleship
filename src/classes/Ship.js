@@ -5,6 +5,9 @@ class Ship {
     this.hits = 0;
   }
 
+  hit() {
+    this.hits += 1;
+  }
   isSunk() {
     return this.hits === this.size;
   }

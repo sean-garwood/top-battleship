@@ -61,4 +61,39 @@ describe("Gameboard", () => {
     expect(() => gameboard.placeShip(ship, -1, 0, Orientations.HORIZONTAL))
       .toThrow;
   });
+  it("should have a receiveAttack method", () => {
+    expect(gameboard.receiveAttack).toBeDefined;
+  });
+  it("should not throw an error if the attack coordinates are in bounds", () => {
+    expect(() => gameboard.receiveAttack(0, 0)).not.toThrow;
+  });
+  it("should throw an error if the attack coordinates are out of bounds", () => {
+    expect(() => gameboard.receiveAttack(10, 0)).toThrow;
+  });
+  it("should throw an error if the attack coordinates are negative", () => {
+    expect(() => gameboard.receiveAttack(-1, 0)).toThrow;
+  });
+  it("should throw an error if the attack coordinates are in bounds, but the attack has already been made", () => {
+    gameboard.receiveAttack(0, 0);
+    expect(() => gameboard.receiveAttack(0, 0)).toThrow;
+  });
+  it("should update the hit count of a ship if the attack is successful", () => {
+    gameboard.placeShip(ship, 0, 0, Orientations.HORIZONTAL);
+    gameboard.receiveAttack(0, 0);
+    expect(ship.hits).toBe(1);
+  });
+  it("should target a ship when a successful attack is made", () => {
+    gameboard.placeShip(ship, 0, 0, Orientations.HORIZONTAL);
+    gameboard.receiveAttack(0, 0);
+    expect(gameboard.board[0][0]).toBe(ship);
+  });
+  it("should update the misses array if the attack is unsuccessful", () => {
+    gameboard.receiveAttack(0, 0);
+    expect(gameboard.attacks.misses).toEqual([{ x: 0, y: 0 }]);
+  });
+  it("should update the hits array if the attack is successful", () => {
+    gameboard.placeShip(ship, 0, 0, Orientations.HORIZONTAL);
+    gameboard.receiveAttack(0, 0);
+    expect(gameboard.attacks.hits).toEqual([{ x: 0, y: 0 }]);
+  });
 });

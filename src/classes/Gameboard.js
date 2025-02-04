@@ -8,6 +8,10 @@ class Gameboard {
       Array.from({ length: this.height }, () => null)
     );
     this.belongsTo = player;
+    this.attacks = {
+      hits: [],
+      misses: [],
+    };
   }
 
   placeShip(ship, startAtX, startAtY, orientation) {
@@ -16,6 +20,20 @@ class Gameboard {
       this.#placeShipHorizontally(ship, startAtX, startAtY);
     } else {
       this.#placeShipVertically(ship, startAtX, startAtY);
+    }
+  }
+
+  receiveAttack(x, y) {
+    this.#validateAttack(x, y);
+
+    const target = this.board[x][y];
+    if (target === null) {
+      this.attacks.misses.push({ x, y });
+      return false;
+    } else {
+      this.attacks.hits.push({ x, y });
+      target.hit();
+      return true;
     }
   }
 
@@ -74,6 +92,21 @@ class Gameboard {
   #placeShipVertically(ship, startAtX, startAtY) {
     for (let i = 0; i < ship.size; i++) {
       this.board[startAtX][startAtY + i] = ship;
+    }
+  }
+
+  #validateAttack(x, y) {
+    if (!(x >= 0 && x < this.width && y >= 0 && y < this.height)) {
+      throw new Error(
+        `Invalid attack coordinates: ${x}, ${y}` +
+          ` for board dimensions: ${this.width}, ${this.height}`
+      );
+    }
+    if (
+      this.attacks.hits.some((hit) => hit.x === x && hit.y === y) ||
+      this.attacks.misses.some((miss) => miss.x === x && miss.y === y)
+    ) {
+      throw new Error(`Coordinates ${x}, ${y} have already been attacked`);
     }
   }
 
