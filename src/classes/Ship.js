@@ -1,12 +1,12 @@
 class Ship {
-  constructor(length, name) {
-    this.length = length;
-    this.name = name;
+  constructor(SHIP) {
+    this.name = SHIP.name;
+    this.size = SHIP.size;
     this.hits = 0;
   }
 
   isSunk() {
-    return this.hits === this.length;
+    return this.hits === this.size;
   }
 }
 

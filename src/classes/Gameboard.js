@@ -1,9 +1,85 @@
 import { BoardDimensions } from "../constants/BoardDimensions";
+import { Orientations } from "../constants/Orientations";
 class Gameboard {
   constructor(player) {
-    this.x = BoardDimensions.BOARD_WIDTH;
-    this.y = BoardDimensions.BOARD_HEIGHT;
+    this.width = BoardDimensions.BOARD_WIDTH;
+    this.height = BoardDimensions.BOARD_HEIGHT;
+    this.board = Array.from({ length: this.width }, () =>
+      Array.from({ length: this.height }, () => null)
+    );
     this.belongsTo = player;
+  }
+
+  placeShip(ship, startAtX, startAtY, orientation) {
+    this.#validatePlacement(ship, startAtX, startAtY, orientation);
+    if (orientation === Orientations.HORIZONTAL) {
+      this.#placeShipHorizontally(ship, startAtX, startAtY);
+    } else {
+      this.#placeShipVertically(ship, startAtX, startAtY);
+    }
+  }
+
+  #catchOutOfBounds(ship, x, y, orientation) {
+    const areNegativeCoordinates = x < 0 || y < 0;
+    if (areNegativeCoordinates) {
+      throw new Error("Coordinates must be positive integers");
+    }
+    const exceedsWidth = x + ship.size > this.width;
+    const exceedsHeight = y + ship.size > this.height;
+    // check orientation
+
+    switch (orientation) {
+      case Orientations.HORIZONTAL:
+        if (exceedsWidth) {
+          throw new Error("Ship exceeds board width");
+        }
+        break;
+      case Orientations.VERTICAL:
+        if (exceedsHeight) {
+          throw new Error("Ship exceeds board height");
+        }
+        break;
+      default:
+        throw new Error("Invalid orientation");
+    }
+  }
+
+  #catchOverlap(ship, x, y, orientation) {
+    switch (orientation) {
+      case Orientations.HORIZONTAL:
+        for (let i = 0; i < ship.size; i++) {
+          if (this.board[x + i][y] !== null) {
+            throw new Error("Ship overlaps another ship");
+          }
+        }
+        break;
+      case Orientations.VERTICAL:
+        for (let i = 0; i < ship.size; i++) {
+          if (this.board[x][y + i] !== null) {
+            throw new Error("Ship overlaps another ship");
+          }
+        }
+        break;
+      default:
+        throw new Error("Invalid orientation");
+    }
+  }
+
+  #placeShipHorizontally(ship, startAtX, startAtY) {
+    for (let i = 0; i < ship.size; i++) {
+      this.board[startAtX + i][startAtY] = ship;
+    }
+  }
+
+  #placeShipVertically(ship, startAtX, startAtY) {
+    for (let i = 0; i < ship.size; i++) {
+      this.board[startAtX][startAtY + i] = ship;
+    }
+  }
+
+  #validatePlacement(ship, x, y, orientation) {
+    this.#catchOutOfBounds(ship, x, y, orientation);
+    this.#catchOverlap(ship, x, y, orientation);
   }
 }
 
