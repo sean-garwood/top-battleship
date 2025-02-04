@@ -1,7 +1,7 @@
 import { BoardDimensions } from "../constants/BoardDimensions";
 import { Orientations } from "../constants/Orientations";
 class Gameboard {
-  constructor(player) {
+  constructor() {
     this.width = BoardDimensions.BOARD_WIDTH;
     this.height = BoardDimensions.BOARD_HEIGHT;
     this.board = Array.from({ length: this.width }, () =>
