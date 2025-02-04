@@ -23,9 +23,6 @@ describe("Gameboard", () => {
   it("should include a y attribute with value of 10", () => {
     expect(gameboard.height).toBe(expectedHeight);
   });
-  it("should include a belongsTo attribute", () => {
-    expect(gameboard.belongsTo).toBe(player);
-  });
   it("should have a board that is an array of arrays", () => {
     expect(gameboard.board).toEqual(
       Array.from({ length: expectedWidth }, () =>
@@ -95,5 +92,17 @@ describe("Gameboard", () => {
     gameboard.placeShip(ship, 0, 0, Orientations.HORIZONTAL);
     gameboard.receiveAttack(0, 0);
     expect(gameboard.attacks.hits).toEqual([{ x: 0, y: 0 }]);
+  });
+  it("should return false for allShipsSunk if no ships have been placed", () => {
+    expect(gameboard.allShipsSunk).toBe(false);
+  });
+  it("should be able to successfully update the allShipsSunk attribute", () => {
+    gameboard.placeShip(ship, 0, 0, Orientations.HORIZONTAL);
+    gameboard.receiveAttack(0, 0);
+    gameboard.receiveAttack(1, 0);
+    gameboard.receiveAttack(2, 0);
+    gameboard.receiveAttack(3, 0);
+    gameboard.receiveAttack(4, 0);
+    expect(gameboard.allShipsSunk).toBe(true);
   });
 });

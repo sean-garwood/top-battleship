@@ -7,11 +7,20 @@ class Gameboard {
     this.board = Array.from({ length: this.width }, () =>
       Array.from({ length: this.height }, () => null)
     );
-    this.belongsTo = player;
     this.attacks = {
       hits: [],
       misses: [],
     };
+    this.ships = [];
+    this._allShipsSunk = false;
+  }
+
+  get allShipsSunk() {
+    return this._allShipsSunk;
+  }
+
+  set allShipsSunk(value) {
+    this._allShipsSunk = value;
   }
 
   placeShip(ship, startAtX, startAtY, orientation) {
@@ -21,6 +30,7 @@ class Gameboard {
     } else {
       this.#placeShipVertically(ship, startAtX, startAtY);
     }
+    this.ships.push(ship);
   }
 
   receiveAttack(x, y) {
@@ -33,6 +43,7 @@ class Gameboard {
     } else {
       this.attacks.hits.push({ x, y });
       target.hit();
+      this.allShipsSunk = this.ships.every((ship) => ship.isSunk());
       return true;
     }
   }
