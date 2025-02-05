@@ -4,6 +4,10 @@
   "type": "module",
   "transform": {},
   "description": "TOP | Project | JS | Battleship",
+  "jest": {
+    "testEnvironment": "node",
+    "bail": 1
+  },
   "main": "index.js",
   "scripts": {
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"

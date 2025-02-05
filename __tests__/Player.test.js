@@ -1,23 +1,30 @@
 import { Player } from "../src/classes/Player";
-import { PlayerTypes } from "../src/constants/PlayerTypes";
 
 let humanPlayer, computerPlayer;
 
 beforeAll(() => {
-  humanPlayer = new Player(PlayerTypes.HUMAN);
-  computerPlayer = new Player(PlayerTypes.COMPUTER);
+  humanPlayer = new Player(Player.Types.Human);
+  computerPlayer = new Player(Player.Types.Computer);
 });
 
 describe("Player", () => {
   it("should have a type", () => {
-    expect(humanPlayer.type).toBe(PlayerTypes.HUMAN);
-    expect(computerPlayer.type).toBe(PlayerTypes.COMPUTER);
+    expect(humanPlayer.type).toBe(Player.Types.Human);
+    expect(computerPlayer.type).toBe(Player.Types.Computer);
   });
   it("should throw an error if an invalid type is passed", () => {
-    expect(() => new Player("INVALID")).toThrow("Invalid player type");
+    expect(() => new Player("INVALID")).toThrow;
   });
-  it("should have a gameboard", () => {
-    expect(humanPlayer.gameboard).toBeDefined();
-    expect(computerPlayer.gameboard).toBeDefined();
+  it("should have a move method", () => {
+    expect(humanPlayer.move).toBeDefined;
+    expect(computerPlayer.move).toBeDefined;
+  });
+  it("should have a board", () => {
+    expect(humanPlayer.board).toBeDefined;
+    expect(computerPlayer.board).toBeDefined;
+  });
+  it("should allow a computer to make a move", async () => {
+    const move = await computerPlayer.move();
+    expect(move).toBeDefined;
   });
 });

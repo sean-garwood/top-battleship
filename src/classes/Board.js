@@ -1,62 +1,77 @@
-import { BoardDimensions } from "../constants/BoardDimensions.js";
-import { Orientations } from "../constants/Orientations.js";
-import { PlayerTypes } from "../constants/PlayerTypes.js";
-class Board {
-  constructor() {
-    this.width = BoardDimensions.BOARD_WIDTH;
-    this.height = BoardDimensions.BOARD_HEIGHT;
-    this.board = Array.from({ length: this.width }, () =>
-      Array.from({ length: this.height }, () => null)
-    );
+import { Ship } from "./Ship.js";
+import { Ships } from "../modules/init/ships.js";
+import { Square } from "./Square.js";
+
+export class Board {
+  static Dimensions = {
+    Height: 10,
+    Width: 10,
+  };
+
+  constructor(owningPlayer) {
+    this.owningPlayer = owningPlayer;
+    this.width = Board.Dimensions.Width;
+    this.height = Board.Dimensions.Height;
+    this.squares = Board.build();
     this.attacks = {
       hits: [],
       misses: [],
     };
-    this.ships = [];
+    this.ships = Ships;
     this._allShipsSunk = false;
   }
 
   get allShipsSunk() {
     return this._allShipsSunk;
   }
-
   set allShipsSunk(value) {
     this._allShipsSunk = value;
   }
+  static build() {
+    // 2D array: 10 rows of 10 squares
+    // m is the row index, n is the column index
+    const board = [];
+    for (let m = 0; m < Board.Dimensions.Height; m++) {
+      board[m] = []; // set up the row
+      for (let n = 0; n < Board.Dimensions.Width; n++) {
+        board[m][n] = new Square(m, n); // add square to mth row at nth index
+      }
+    }
+    return board;
+  }
 
-  draw(playerType) {
+  draw() {
     const boardDivContainerID =
-      playerType === PlayerTypes.HUMAN
+      this.type === Player.Types.Human
         ? "human-board-container"
         : "computer-board-container";
     const boardDivContainer = document.getElementById(boardDivContainerID);
     const boardDiv = document.createElement("div");
     boardDiv.classList.add("board");
     boardDiv.id =
-      playerType === PlayerTypes.HUMAN ? "human-board" : "computer-board";
-    for (let y = BoardDimensions.BOARD_HEIGHT - 1; y >= 0; y--) {
+      this.type === Player.Types.Human ? "human-board" : "computer-board";
+    for (let y = this.height - 1; y >= 0; y--) {
       const rowDiv = document.createElement("div");
       rowDiv.classList.add("row");
       rowDiv.dataset.y = y;
-      for (let x = 0; x < BoardDimensions.BOARD_WIDTH; x++) {
-        const cell = document.createElement("div");
-        cell.dataset.x = x;
-        cell.dataset.y = y;
-        cell.classList.add("cell");
-        playerType === PlayerTypes.HUMAN
-          ? cell.classList.add("human")
-          : cell.classList.add("computer");
-        rowDiv.appendChild(cell);
-        if (playerType === PlayerTypes.COMPUTER) {
-          cell.addEventListener("click", (e) => {
+      for (let x = 0; x < this.width; x++) {
+        const cellDiv = document.createElement("div");
+        cellDiv.dataset.x = x;
+        cellDiv.dataset.y = y;
+        cellDiv.classList.add("cell-div");
+        this.type === Player.Types.Human
+          ? cellDiv.classList.add("human")
+          : cellDiv.classList.add("computer");
+        rowDiv.appendChild(cellDiv);
+
+        if (this.type === Player.Types.Computer) {
+          cellDiv.addEventListener("click", (e) => {
             const x = parseInt(e.target.dataset.x);
             const y = parseInt(e.target.dataset.y);
             const result = this.receiveAttack(x, y);
             if (result) {
-              // is a hit
               e.target.classList.add("hit");
             } else {
-              // is a miss
               e.target.classList.add("miss");
             }
           });
@@ -68,107 +83,75 @@ class Board {
     boardDivContainer.appendChild(boardDiv);
   }
 
-  placeShip(ship, startAtX, startAtY, orientation) {
-    this.#validatePlacement(ship, startAtX, startAtY, orientation);
-    if (orientation === Orientations.HORIZONTAL) {
-      this.#placeShipHorizontally(ship, startAtX, startAtY);
-    } else {
-      this.#placeShipVertically(ship, startAtX, startAtY);
+  // TODO: cleanup this pile of garbage
+
+  placeShip(ship, startX, startY) {
+    if (
+      startX < 0 ||
+      startX >= this.width ||
+      startY < 0 ||
+      startY >= this.height
+    ) {
+      throw new Error("Invalid coordinates");
     }
-    this.ships.push(ship);
+    if (
+      ship.orientation === Ship.Orientations.Horizontal &&
+      startX + ship.size > this.width
+    ) {
+      throw new Error("Ship out of bounds");
+    }
+    if (
+      ship.orientation === Ship.Orientations.Vertical &&
+      startY + ship.size > this.height
+    ) {
+      throw new Error("Ship out of bounds");
+    }
+    for (let i = 0; i < ship.size; i++) {
+      if (
+        ship.orientation === Ship.Orientations.Horizontal &&
+        this.squares[startX + i][startY].isOccupied
+      ) {
+        throw new Error("Square occupied");
+      }
+      if (
+        ship.orientation === Ship.Orientations.Vertical &&
+        this.squares[startX][startY + i].isOccupied
+      ) {
+        throw new Error("Square occupied");
+      }
+    }
+    for (let i = 0; i < ship.size; i++) {
+      if (ship.orientation === Ship.Orientations.Horizontal) {
+        this.squares[startY + i][startX].ship = ship;
+      } else {
+        this.squares[startY][startX + i].ship = ship;
+      }
+    }
   }
 
   receiveAttack(x, y) {
-    this.#validateAttack(x, y);
-
-    const target = this.board[x][y];
-    if (target === null) {
+    if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
+      throw new Error("Invalid coordinates");
+    }
+    if (this.squares[x][y].isAttacked) {
+      throw new Error("Square already attacked");
+    }
+    this.squares[x][y].isAttacked = true;
+    if (this.squares[x][y].isOccupied) {
+      this.squares[x][y].ship.hit();
+      this.attacks.hits.push({ x, y });
+      if (this.squares[x][y].ship.isSunk()) {
+        this.ships = this.ships.filter(
+          (ship) => ship !== this.squares[x][y].ship
+        );
+        if (this.ships.length === 0) {
+          this.allShipsSunk = true;
+        }
+      }
+      return true;
+    } else {
       this.attacks.misses.push({ x, y });
       return false;
-    } else {
-      this.attacks.hits.push({ x, y });
-      target.hit();
-      this.allShipsSunk = this.ships.every((ship) => ship.isSunk());
-      return true;
     }
-  }
-
-  #catchOutOfBounds(ship, x, y, orientation) {
-    const areNegativeCoordinates = x < 0 || y < 0;
-    if (areNegativeCoordinates) {
-      throw new Error("Coordinates must be positive integers");
-    }
-    const exceedsWidth = x + ship.size > this.width;
-    const exceedsHeight = y + ship.size > this.height;
-
-    switch (orientation) {
-      case Orientations.HORIZONTAL:
-        if (exceedsWidth) {
-          throw new Error("Ship exceeds board width");
-        }
-        break;
-      case Orientations.VERTICAL:
-        if (exceedsHeight) {
-          throw new Error("Ship exceeds board height");
-        }
-        break;
-      default:
-        throw new Error("Invalid orientation");
-    }
-  }
-
-  #catchOverlap(ship, x, y, orientation) {
-    switch (orientation) {
-      case Orientations.HORIZONTAL:
-        for (let i = 0; i < ship.size; i++) {
-          if (this.board[x + i][y] !== null) {
-            throw new Error("Ship overlaps another ship");
-          }
-        }
-        break;
-      case Orientations.VERTICAL:
-        for (let i = 0; i < ship.size; i++) {
-          if (this.board[x][y + i] !== null) {
-            throw new Error("Ship overlaps another ship");
-          }
-        }
-        break;
-      default:
-        throw new Error("Invalid orientation");
-    }
-  }
-
-  #placeShipHorizontally(ship, startAtX, startAtY) {
-    for (let i = 0; i < ship.size; i++) {
-      this.board[startAtX + i][startAtY] = ship;
-    }
-  }
-
-  #placeShipVertically(ship, startAtX, startAtY) {
-    for (let i = 0; i < ship.size; i++) {
-      this.board[startAtX][startAtY + i] = ship;
-    }
-  }
-
-  #validateAttack(x, y) {
-    if (!(x >= 0 && x < this.width && y >= 0 && y < this.height)) {
-      throw new Error(
-        `Invalid attack coordinates: ${x}, ${y}` +
-          ` for board dimensions: ${this.width}, ${this.height}`
-      );
-    }
-    if (
-      this.attacks.hits.some((hit) => hit.x === x && hit.y === y) ||
-      this.attacks.misses.some((miss) => miss.x === x && miss.y === y)
-    ) {
-      throw new Error(`Coordinates ${x}, ${y} have already been attacked`);
-    }
-  }
-
-  #validatePlacement(ship, x, y, orientation) {
-    this.#catchOutOfBounds(ship, x, y, orientation);
-    this.#catchOverlap(ship, x, y, orientation);
   }
 }
-
-export { Board };

@@ -3,7 +3,7 @@
   --line-height: 1.5;
   /* colors */
   --accent: #ffffff;
-  --empty-cell: lightgrey;
+  --empty-square: lightgrey;
   --hit: #ff0000;
   --link-color: #1adae8;
   --miss: #000;
@@ -11,7 +11,7 @@
   --secondary-color: #e2e2e2;
   --text-color: #333333;
   /* effects */
-  --cell-borders: 1px solid #000;
+  --square-borders: 1px solid #000;
   --hover-border: 1px solid orange;
   --hover: #4c5a63;
 }
@@ -46,7 +46,8 @@ header {
   text-align: center;
 }
 
-h1, h2{
+h1,
+h2 {
   margin: 0;
 }
 
@@ -97,9 +98,9 @@ footer {
   align-items: center;
 }
 
-.cell {
-  background: var(--empty-cell);
-  border: var(--cell-borders);
+.square {
+  background: var(--empty-square);
+  border: var(--square-borders);
   color: var(--accent);
   font-size: 24px;
   font-weight: bold;
@@ -108,7 +109,7 @@ footer {
   width: 50px;
 }
 
-.cell:hover {
+.square:hover {
   background: var(--hover);
   color: var(--accent);
   border: var(--hover-border);
@@ -119,7 +120,7 @@ footer {
   background: var(--hit);
 }
 
-.cell.miss {
+.square.miss {
   background: var(--miss);
 }
 
@@ -137,5 +138,5 @@ footer {
   justify-content: center;
   flex-direction: row;
   min-height: 60vh;
-  width: 100%
+  width: 100%;
 }
