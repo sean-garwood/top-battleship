@@ -1,7 +1,7 @@
 import { BoardDimensions } from "../constants/BoardDimensions.js";
 import { Orientations } from "../constants/Orientations.js";
 import { PlayerTypes } from "../constants/PlayerTypes.js";
-class Gameboard {
+class Board {
   constructor() {
     this.width = BoardDimensions.BOARD_WIDTH;
     this.height = BoardDimensions.BOARD_HEIGHT;
@@ -51,7 +51,14 @@ class Gameboard {
           cell.addEventListener("click", (e) => {
             const x = parseInt(e.target.dataset.x);
             const y = parseInt(e.target.dataset.y);
-            this.receiveAttack(x, y);
+            const result = this.receiveAttack(x, y);
+            if (result) {
+              // is a hit
+              e.target.classList.add("hit");
+            } else {
+              // is a miss
+              e.target.classList.add("miss");
+            }
           });
         }
       }
@@ -164,4 +171,4 @@ class Gameboard {
   }
 }
 
-export { Gameboard };
+export { Board };

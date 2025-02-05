@@ -1,14 +1,14 @@
 import { validatePlayerType as validate } from "../constants/PlayerTypes.js";
-import { Gameboard } from "./Gameboard.js";
+import { Board } from "./Board.js";
 
 class Player {
   constructor(type) {
     this.type = validate(type);
-    this.gameboard = new Gameboard();
+    this.board = new Board();
   }
 
   drawBoard() {
-    this.gameboard.draw(this.type);
+    this.board.draw(this.type);
   }
 }
 

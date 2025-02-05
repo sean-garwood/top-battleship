@@ -4,7 +4,9 @@
   /* colors */
   --accent: #ffffff;
   --empty-cell: lightgrey;
+  --hit: #ff0000;
   --link-color: #1adae8;
+  --miss: #000;
   --primary-color: #35424a;
   --secondary-color: #e2e2e2;
   --text-color: #333333;
@@ -111,6 +113,14 @@ footer {
   color: var(--accent);
   border: var(--hover-border);
   transition: background ease 0.2s;
+}
+
+.ship.hit {
+  background: var(--hit);
+}
+
+.cell.miss {
+  background: var(--miss);
 }
 
 .row {
