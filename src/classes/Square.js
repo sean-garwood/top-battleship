@@ -1,10 +1,5 @@
 export class Square {
   // make a Map?
-  static TargetStatusMap = {
-    null: "Empty",
-    0: "Miss",
-    1: "Hit",
-  };
   static TargetStatuses = {
     Miss: -1,
     Empty: 0,

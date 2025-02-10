@@ -1,6 +1,6 @@
 export function drawShips(boards) {
-  const humanBoard = boards.humanBoard;
-  const computerBoard = boards.computerBoard;
+  const humanBoard = boards.one;
+  const computerBoard = boards.two;
   const humanBoardDiv = document.getElementById("human-board");
   const computerBoardDiv = document.getElementById("computer-board");
 
@@ -10,7 +10,7 @@ export function drawShips(boards) {
         const square = boardDiv.querySelector(
           `.square[data-x="${x}"][data-y="${y}"]`
         );
-        if (board.board[x][y] !== null) {
+        if (board.squares[x][y].isOccupied) {
           square.classList.add("ship");
         }
       }

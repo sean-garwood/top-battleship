@@ -98,6 +98,11 @@ footer {
   align-items: center;
 }
 
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
 .square {
   background: var(--empty-square);
   border: var(--square-borders);
@@ -109,11 +114,20 @@ footer {
   width: 50px;
 }
 
-.square:hover {
+.square.computer {
+  cursor: pointer;
+}
+
+.square.computer:hover {
   background: var(--hover);
   color: var(--accent);
   border: var(--hover-border);
   transition: background ease 0.2s;
+}
+
+.square.human:hover{
+  /* show that it's _not_ clickable with crosshatch */
+  background-image: repeating-linear-gradient(45deg, var(--primary-color), var(--primary-color) 10px, var(--secondary-color) 10px, var(--secondary-color) 20px);
 }
 
 .ship.hit {
@@ -122,11 +136,6 @@ footer {
 
 .square.miss {
   background: var(--miss);
-}
-
-.row {
-  display: flex;
-  flex-direction: row;
 }
 
 .ship {

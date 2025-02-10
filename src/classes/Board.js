@@ -1,6 +1,8 @@
 import { Ship } from "./Ship.js";
 import { Ships } from "../modules/init/ships.js";
 import { Square } from "./Square.js";
+import { boardDrawing } from "../modules/board-drawing.js";
+import { Player } from "../classes/Player.js";
 
 export class Board {
   static Dimensions = {
@@ -8,8 +10,8 @@ export class Board {
     Width: 10,
   };
 
-  constructor(owningPlayer) {
-    this.owningPlayer = owningPlayer;
+  constructor(owner) {
+    this.owner = owner;
     this.width = Board.Dimensions.Width;
     this.height = Board.Dimensions.Height;
     this.squares = Board.build();
@@ -19,6 +21,15 @@ export class Board {
     };
     this.ships = Ships;
     this._allShipsSunk = false;
+
+    // Bind drawing methods to this instance
+    this.getBoardContainerID = boardDrawing.getBoardContainerID.bind(this);
+    this.createBoardDiv = boardDrawing.createBoardDiv.bind(this);
+    this.createRowDiv = boardDrawing.createRowDiv.bind(this);
+    this.createSquareDiv = boardDrawing.createSquareDiv.bind(this);
+    this.addComputerBoardEventListener =
+      boardDrawing.addComputerBoardEventListener.bind(this);
+    this.draw();
   }
 
   get allShipsSunk() {
@@ -41,40 +52,18 @@ export class Board {
   }
 
   draw() {
-    const boardDivContainerID =
-      this.type === Player.Types.Human
-        ? "human-board-container"
-        : "computer-board-container";
+    const boardDivContainerID = this.getBoardContainerID();
     const boardDivContainer = document.getElementById(boardDivContainerID);
-    const boardDiv = document.createElement("div");
-    boardDiv.classList.add("board");
-    boardDiv.id =
-      this.type === Player.Types.Human ? "human-board" : "computer-board";
+    const boardDiv = this.createBoardDiv();
+
     for (let y = this.height - 1; y >= 0; y--) {
-      const rowDiv = document.createElement("div");
-      rowDiv.classList.add("row");
-      rowDiv.dataset.y = y;
+      const rowDiv = this.createRowDiv(y);
       for (let x = 0; x < this.width; x++) {
-        const cellDiv = document.createElement("div");
-        cellDiv.dataset.x = x;
-        cellDiv.dataset.y = y;
-        cellDiv.classList.add("cell-div");
-        this.type === Player.Types.Human
-          ? cellDiv.classList.add("human")
-          : cellDiv.classList.add("computer");
-        rowDiv.appendChild(cellDiv);
+        const squareDiv = this.createSquareDiv(x, y);
+        rowDiv.appendChild(squareDiv);
 
         if (this.type === Player.Types.Computer) {
-          cellDiv.addEventListener("click", (e) => {
-            const x = parseInt(e.target.dataset.x);
-            const y = parseInt(e.target.dataset.y);
-            const result = this.receiveAttack(x, y);
-            if (result) {
-              e.target.classList.add("hit");
-            } else {
-              e.target.classList.add("miss");
-            }
-          });
+          this.addComputerBoardEventListener(squareDiv, x, y);
         }
       }
       boardDiv.appendChild(rowDiv);
