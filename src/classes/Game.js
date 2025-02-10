@@ -30,27 +30,26 @@ export class Game {
     this._winner = player;
   }
 
-  play() {
+  async play() {
     while (!this.winner && this.turns < Game.MaxTurns) {
-      this.currentPlayer.move();
-      this.winner = this.#checkForWinner();
-      if (this.winner) {
-        this.#endGame();
-        break;
-      }
-
-      this.currentPlayer = this.#getNextPlayer();
+      const player = this.currentPlayer;
+      const targetBoard =
+        this.currentPlayer === this.players.one
+          ? this.boards.two
+          : this.boards.one;
+      const move = await player.move();
+      targetBoard.receiveAttack(move);
+      this.#checkForWinner() || (this.currentPlayer = this.#getNextPlayer());
     }
+    this.#endGame();
   }
 
   #checkForWinner() {
-    let winner = null;
-    if (this.boards.one.allShipsSunk) {
-      winner = this.players.two;
-    } else if (this.boards.two.allShipsSunk) {
-      winner = this.players.one;
+    if (this.boards.one.allShipsSunk || this.boards.two.allShipsSunk) {
+      this.winner = this.currentPlayer;
+      return true;
     }
-    return winner;
+    return false;
   }
 
   #endGame() {

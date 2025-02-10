@@ -6,7 +6,8 @@ export class Square {
     Hit: 1,
   };
 
-  constructor(x, y) {
+  constructor(x, y, owner) {
+    this.owner = owner;
     this._coordinates = {
       x: x,
       y: y,
@@ -19,6 +20,17 @@ export class Square {
     return this._coordinates;
   }
 
+  get div() {
+    const dataX = this.coordinates.x;
+    const dataY = this.coordinates.y;
+    return document
+      .querySelector(`[data-x="${dataX}"][data-y="${dataY}"]`)
+      .querySelector(`.${this.owner.type}`);
+  }
+
+  get hasBeenAttacked() {
+    return this._targetStatus !== Square.TargetStatuses.Empty;
+  }
   get isHit() {
     return this._targetStatus === Square.TargetStatuses.Hit;
   }

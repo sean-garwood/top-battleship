@@ -32,7 +32,7 @@ export const boardDrawing = {
     return squareDiv;
   },
 
-  addComputerBoardEventListener(squareDiv, x, y) {
+  addComputerBoardEventListener(squareDiv) {
     squareDiv.addEventListener("click", (e) => {
       const x = parseInt(e.target.dataset.x);
       const y = parseInt(e.target.dataset.y);

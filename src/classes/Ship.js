@@ -6,6 +6,7 @@ export class Ship {
   constructor(orientation = Ship.Orientations.Horizontal) {
     this._hits = 0;
     this.orientation = orientation;
+    this._isSunk = false;
   }
 
   get hits() {
@@ -16,11 +17,17 @@ export class Ship {
     this._hits = value;
   }
 
-  hit() {
-    this.hits++;
+  get isSunk() {
+    return this._isSunk;
+  }
+  set isSunk(value) {
+    this._isSunk = value;
   }
 
-  isSunk() {
-    return this.hits === this.size;
+  hit() {
+    this.hits++;
+    if (this.hits === this.size) {
+      this.isSunk = true;
+    }
   }
 }

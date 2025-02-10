@@ -4,7 +4,7 @@ import { placeShips } from "./init/place-ships.js";
 
 export function init() {
   document.addEventListener("DOMContentLoaded", () => {
-    let game = new Game();
+    const game = new Game();
     const boards = game.boards;
     placeShips(boards);
     drawShips(boards);

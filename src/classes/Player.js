@@ -21,18 +21,24 @@ export class Player {
 
   async #humanMove() {
     let move;
-    const computerBoardDiv = document.getElementById("computer-board");
-    await new Promise((resolve) => {
-      computerBoardDiv.onclick = (e) => {
-        const square = e.target.closest(".square");
-        if (square) {
-          const intX = parseInt(square.dataset.x);
-          const intY = parseInt(square.dataset.y);
-          move = { x: intX, y: intY };
-          resolve();
-        }
+    // we already added the event listener to the computer board squares.
+    // need to __await a click on one of them__ and return the coordinates of
+    // the square clicked.
+
+    // we can use the following code to wait for a click event:
+    const square = await new Promise((resolve) => {
+      const handleClick = (e) => {
+        e.target.removeEventListener("click", handleClick);
+        resolve(e.target);
       };
+      document
+        .getElementById("computer-board")
+        .addEventListener("click", handleClick);
     });
+    move = {
+      x: parseInt(square.dataset.x),
+      y: parseInt(square.dataset.y),
+    };
     return move;
   }
 

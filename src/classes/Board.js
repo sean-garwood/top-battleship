@@ -20,7 +20,6 @@ export class Board {
       misses: [],
     };
     this.ships = Ships;
-    this._allShipsSunk = false;
 
     // Bind drawing methods to this instance
     this.getBoardContainerID = boardDrawing.getBoardContainerID.bind(this);
@@ -32,12 +31,6 @@ export class Board {
     this.draw();
   }
 
-  get allShipsSunk() {
-    return this._allShipsSunk;
-  }
-  set allShipsSunk(value) {
-    this._allShipsSunk = value;
-  }
   static build() {
     // 2D array: 10 rows of 10 squares
     // m is the row index, n is the column index
@@ -45,10 +38,15 @@ export class Board {
     for (let m = 0; m < Board.Dimensions.Height; m++) {
       board[m] = []; // set up the row
       for (let n = 0; n < Board.Dimensions.Width; n++) {
-        board[m][n] = new Square(m, n); // add square to mth row at nth index
+        board[m][n] = new Square(m, n, this.owner); // add square to mth row at nth index
       }
     }
     return board;
+  }
+
+  get allShipsSunk() {
+    // remember: this.ships is an Object, not an Array!!!
+    return Object.values(this.ships).every((ship) => ship.isSunk);
   }
 
   draw() {
@@ -118,29 +116,34 @@ export class Board {
     }
   }
 
-  receiveAttack(x, y) {
-    if (x < 0 || x >= this.width || y < 0 || y >= this.height) {
-      throw new Error("Invalid coordinates");
+  receiveAttack({ x, y }) {
+    const outOfBounds = x < 0 || x >= this.width || y < 0 || y >= this.height;
+    const target = this.squares[x][y];
+    const alreadyAttacked = target.hasBeenAttacked;
+    let attackSuccessful = false;
+    if (alreadyAttacked || outOfBounds) {
+      const message = "Invalid attack:";
+      const reason = outOfBounds ? " out of bounds" : " already attacked";
+      alert(message + reason);
+      return attackSuccessful;
     }
-    if (this.squares[x][y].isAttacked) {
-      throw new Error("Square already attacked");
-    }
-    this.squares[x][y].isAttacked = true;
-    if (this.squares[x][y].isOccupied) {
-      this.squares[x][y].ship.hit();
+    attackSuccessful = true;
+    if (target.isOccupied) {
+      target.targetStatus = Square.TargetStatuses.Hit;
+      target.ship.hit();
+      target.div.classList.add("hit");
       this.attacks.hits.push({ x, y });
-      if (this.squares[x][y].ship.isSunk()) {
-        this.ships = this.ships.filter(
-          (ship) => ship !== this.squares[x][y].ship
-        );
-        if (this.ships.length === 0) {
-          this.allShipsSunk = true;
-        }
+      if (target.ship.isSunk) {
+        // get current player type to replace the `You` below.
+        const currentPlayerType =
+          this.owner.type === Player.Types.Human ? "Computer" : "You";
+        alert(`${currentPlayerType} sunk the ${target.ship.name}`);
       }
-      return true;
     } else {
+      target.targetStatus = Square.TargetStatuses.Miss;
+      target.div.classList.add("miss");
       this.attacks.misses.push({ x, y });
-      return false;
     }
+    return attackSuccessful;
   }
 }
