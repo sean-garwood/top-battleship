@@ -23,9 +23,9 @@ export class Square {
   get div() {
     const dataX = this.coordinates.x;
     const dataY = this.coordinates.y;
-    return document
-      .querySelector(`[data-x="${dataX}"][data-y="${dataY}"]`)
-      .querySelector(`.${this.owner.type}`);
+    return document.querySelector(
+      `.${this.owner}[data-x="${dataX}"][data-y="${dataY}"]`
+    );
   }
 
   get hasBeenAttacked() {

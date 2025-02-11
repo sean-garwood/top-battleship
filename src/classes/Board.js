@@ -14,7 +14,7 @@ export class Board {
     this.owner = owner;
     this.width = Board.Dimensions.Width;
     this.height = Board.Dimensions.Height;
-    this.squares = Board.build();
+    this.squares = this.build();
     this.attacks = {
       hits: [],
       misses: [],
@@ -31,14 +31,14 @@ export class Board {
     this.draw();
   }
 
-  static build() {
+  build() {
     // 2D array: 10 rows of 10 squares
     // m is the row index, n is the column index
     const board = [];
     for (let m = 0; m < Board.Dimensions.Height; m++) {
       board[m] = []; // set up the row
       for (let n = 0; n < Board.Dimensions.Width; n++) {
-        board[m][n] = new Square(m, n, this.owner); // add square to mth row at nth index
+        board[m][n] = new Square(m, n, this.owner.type.toLowerCase()); // add square to mth row at nth index
       }
     }
     return board;
@@ -47,6 +47,10 @@ export class Board {
   get allShipsSunk() {
     // remember: this.ships is an Object, not an Array!!!
     return Object.values(this.ships).every((ship) => ship.isSunk);
+  }
+
+  getSquareAt(x, y) {
+    return this.squares[x][y];
   }
 
   draw() {
@@ -118,7 +122,7 @@ export class Board {
 
   receiveAttack({ x, y }) {
     const outOfBounds = x < 0 || x >= this.width || y < 0 || y >= this.height;
-    const target = this.squares[x][y];
+    const target = this.getSquareAt(x, y);
     const alreadyAttacked = target.hasBeenAttacked;
     let attackSuccessful = false;
     if (alreadyAttacked || outOfBounds) {
