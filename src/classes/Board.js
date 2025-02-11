@@ -1,5 +1,4 @@
 import { Ship } from "./Ship.js";
-import { Ships } from "../modules/init/ships.js";
 import { Square } from "./Square.js";
 import { boardDrawing } from "../modules/board-drawing.js";
 import { Player } from "../classes/Player.js";
@@ -19,7 +18,7 @@ export class Board {
       hits: [],
       misses: [],
     };
-    this.ships = Ships;
+    this.ships = owner.ships;
 
     // Bind drawing methods to this instance
     this.getBoardContainerID = boardDrawing.getBoardContainerID.bind(this);
@@ -31,25 +30,32 @@ export class Board {
     this.draw();
   }
 
+  addShipClass() {
+    this.squares.forEach((row) => {
+      row
+        .filter((square) => square.isOccupied)
+        .forEach((square) => {
+          square.div.classList.add("ship", `${square.ship.name.toLowerCase()}`);
+        });
+    });
+  }
+
   build() {
-    // 2D array: 10 rows of 10 squares
-    // m is the row index, n is the column index
     const board = [];
     for (let m = 0; m < Board.Dimensions.Height; m++) {
-      board[m] = []; // set up the row
+      board[m] = [];
       for (let n = 0; n < Board.Dimensions.Width; n++) {
-        board[m][n] = new Square(m, n, this.owner.type.toLowerCase()); // add square to mth row at nth index
+        board[m][n] = new Square(m, n, this.owner.type.toLowerCase());
       }
     }
     return board;
   }
 
   get allShipsSunk() {
-    // remember: this.ships is an Object, not an Array!!!
     return Object.values(this.ships).every((ship) => ship.isSunk);
   }
 
-  getSquareAt(x, y) {
+  squareAt(x, y) {
     return this.squares[x][y];
   }
 
@@ -74,9 +80,7 @@ export class Board {
     boardDivContainer.appendChild(boardDiv);
   }
 
-  // TODO: cleanup this pile of garbage
-
-  placeShip(ship, startX, startY) {
+  placeShip(ship, startX, startY, orientation = Ship.Orientations.Horizontal) {
     if (
       startX < 0 ||
       startX >= this.width ||
@@ -86,68 +90,70 @@ export class Board {
       throw new Error("Invalid coordinates");
     }
     if (
-      ship.orientation === Ship.Orientations.Horizontal &&
+      orientation === Ship.Orientations.Horizontal &&
       startX + ship.size > this.width
     ) {
       throw new Error("Ship out of bounds");
     }
     if (
-      ship.orientation === Ship.Orientations.Vertical &&
+      orientation === Ship.Orientations.Vertical &&
       startY + ship.size > this.height
     ) {
       throw new Error("Ship out of bounds");
     }
     for (let i = 0; i < ship.size; i++) {
       if (
-        ship.orientation === Ship.Orientations.Horizontal &&
-        this.squares[startX + i][startY].isOccupied
+        orientation === Ship.Orientations.Horizontal &&
+        this.squareAt(startX + i, startY).isOccupied
       ) {
         throw new Error("Square occupied");
       }
       if (
-        ship.orientation === Ship.Orientations.Vertical &&
-        this.squares[startX][startY + i].isOccupied
+        orientation === Ship.Orientations.Vertical &&
+        this.squareAt(startX, startY + i).isOccupied
       ) {
         throw new Error("Square occupied");
       }
     }
     for (let i = 0; i < ship.size; i++) {
-      if (ship.orientation === Ship.Orientations.Horizontal) {
-        this.squares[startY + i][startX].ship = ship;
+      if (orientation === Ship.Orientations.Horizontal) {
+        this.squareAt(startX + i, startY).ship = ship;
       } else {
-        this.squares[startY][startX + i].ship = ship;
+        this.squareAt(startX, startY + i).ship = ship;
       }
     }
   }
 
   receiveAttack({ x, y }) {
-    const outOfBounds = x < 0 || x >= this.width || y < 0 || y >= this.height;
-    const target = this.getSquareAt(x, y);
+    const target = this.squareAt(x, y);
     const alreadyAttacked = target.hasBeenAttacked;
     let attackSuccessful = false;
-    if (alreadyAttacked || outOfBounds) {
-      const message = "Invalid attack:";
-      const reason = outOfBounds ? " out of bounds" : " already attacked";
-      alert(message + reason);
+    let message;
+    if (alreadyAttacked) {
+      alert(`Invalid attack: already attacked (${x}, ${y})`);
       return attackSuccessful;
     }
+
     attackSuccessful = true;
+    message = `Attack at (${x}, ${y}) sent to ${this.owner.type}'s board and`;
     if (target.isOccupied) {
       target.targetStatus = Square.TargetStatuses.Hit;
       target.ship.hit();
       target.div.classList.add("hit");
+      message += ` hit the ${target.ship.name}`;
       this.attacks.hits.push({ x, y });
       if (target.ship.isSunk) {
-        // get current player type to replace the `You` below.
         const currentPlayerType =
           this.owner.type === Player.Types.Human ? "Computer" : "You";
         alert(`${currentPlayerType} sunk the ${target.ship.name}`);
       }
     } else {
+      message += " missed!";
       target.targetStatus = Square.TargetStatuses.Miss;
       target.div.classList.add("miss");
       this.attacks.misses.push({ x, y });
     }
+    alert(message);
     return attackSuccessful;
   }
 }

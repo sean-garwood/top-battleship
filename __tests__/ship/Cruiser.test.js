@@ -24,12 +24,14 @@ describe("Cruiser", () => {
   });
 
   it("should not be sunk when created", () => {
-    expect(cruiser.isSunk()).toBe(false);
+    expect(cruiser.isSunk).toBe(false);
   });
 
   it("should be sunk when hits equal size", () => {
-    cruiser.hits = cruiser.size;
-    expect(cruiser.isSunk()).toBe(true);
+    for (let i = 0; i < cruiser.size; i++) {
+      cruiser.hit();
+    }
+    expect(cruiser.isSunk).toBe(true);
   });
 
   it("should increment hits when hit method is called", () => {
@@ -39,7 +41,10 @@ describe("Cruiser", () => {
   });
 
   it("should not be sunk when hits are less than size", () => {
-    cruiser.hits = cruiser.size - 1;
-    expect(cruiser.isSunk()).toBe(false);
+    const oneFewerHit = cruiser.size - 1;
+    for (let i = 0; i < oneFewerHit; i++) {
+      cruiser.hit();
+    }
+    expect(cruiser.isSunk).toBe(false);
   });
 });

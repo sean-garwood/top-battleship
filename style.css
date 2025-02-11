@@ -14,6 +14,12 @@
   --square-borders: 1px solid #000;
   --hover-border: 1px solid orange;
   --hover: #4c5a63;
+  /* debugging: ships have diff background-colors */
+  --battleship: #ffffff;
+  --carrier: #00ff00;
+  --cruiser: #0000ff;
+  --destroyer: #ff00ff;
+  --submarine: #00ffff;
 }
 
 a {
@@ -138,8 +144,24 @@ footer {
   background: var(--miss);
 }
 
-.ship {
-  background: var(--primary-color);
+.battleship {
+  background: var(--battleship);
+}
+
+.carrier {
+  background: var(--carrier);
+}
+
+.cruiser {
+  background: var(--cruiser);
+}
+
+.destroyer {
+  background: var(--destroyer);
+}
+
+.submarine {
+  background: var(--submarine);
 }
 
 #boards-container {

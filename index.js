@@ -1,3 +1,16 @@
-import { init } from "./src/modules/init.js";
+import { Game } from "./src/classes/Game.js";
 
-init();
+document.addEventListener("DOMContentLoaded", async () => {
+  const debug = 0;
+  const game = new Game();
+  const humanPlayer = game.players.one;
+  const computerPlayer = game.players.two;
+
+  debug
+    ? humanPlayer.placeShipsAutomatically()
+    : humanPlayer.placeShipsManually();
+
+  computerPlayer.placeShipsAutomatically();
+
+  game.play();
+});

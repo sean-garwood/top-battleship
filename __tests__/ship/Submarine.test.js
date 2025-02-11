@@ -24,13 +24,13 @@ describe("Submarine", () => {
   });
 
   it("should not be sunk initially", () => {
-    expect(submarine.isSunk()).toBe(false);
+    expect(submarine.isSunk).toBe(false);
   });
 
   it("should be sunk after taking 3 hits", () => {
     submarine.hit();
     submarine.hit();
     submarine.hit();
-    expect(submarine.isSunk()).toBe(true);
+    expect(submarine.isSunk).toBe(true);
   });
 });

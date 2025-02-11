@@ -1,11 +1,11 @@
-import { Players } from "../modules/init/players.js";
+import { Player } from "./Player.js";
 
 export class Game {
   static MaxTurns;
   constructor() {
     this.players = {
-      one: Players.one,
-      two: Players.two,
+      one: new Player(Player.Types.Human),
+      two: new Player(Player.Types.Computer),
     };
     this.boards = {
       one: this.players.one.board,

@@ -24,12 +24,12 @@ describe("Destroyer", () => {
   });
 
   it("should not be sunk initially", () => {
-    expect(destroyer.isSunk()).toBe(false);
+    expect(destroyer.isSunk).toBe(false);
   });
 
   it("should be sunk after taking 2 hits", () => {
     destroyer.hit();
     destroyer.hit();
-    expect(destroyer.isSunk()).toBe(true);
+    expect(destroyer.isSunk).toBe(true);
   });
 });

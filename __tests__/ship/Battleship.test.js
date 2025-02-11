@@ -32,6 +32,6 @@ describe("Battleship", () => {
     for (let i = 0; i < battleship.size; i++) {
       battleship.hit();
     }
-    expect(battleship.isSunk()).toBe(true);
+    expect(battleship.isSunk).toBe(true);
   });
 });

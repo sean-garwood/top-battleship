@@ -1,5 +1,4 @@
 export class Square {
-  // make a Map?
   static TargetStatuses = {
     Miss: -1,
     Empty: 0,

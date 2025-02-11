@@ -17,6 +17,6 @@ describe("Ship", () => {
     expect(ship.hits).toEqual(0);
   });
   it("should not be sunk when created", () => {
-    expect(ship.isSunk()).toBe(false);
+    expect(ship.isSunk).toBe(false);
   });
 });

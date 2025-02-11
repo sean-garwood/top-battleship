@@ -29,11 +29,13 @@ describe("Carrier", () => {
   });
 
   it("should not be sunk when created", () => {
-    expect(carrier.isSunk()).toBe(false);
+    expect(carrier.isSunk).toBe(false);
   });
 
   it("should be sunk when hits equal size", () => {
-    carrier.hits = carrier.size;
-    expect(carrier.isSunk()).toBe(true);
+    for (let i = 0; i < carrier.size; i++) {
+      carrier.hit();
+    }
+    expect(carrier.isSunk).toBe(true);
   });
 });
